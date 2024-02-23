@@ -20,11 +20,13 @@ with  visit_codes as (
     )
 
 ), visits_encounters as (
-    select patient_id
+
+    select 
+           patient_id
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
     from {{ref('quality_measures__stg_core__encounter')}} encounter
-    inner join {{ref('quality_measures__int_234__performance_period')}} as pp
+    inner join {{ref('quality_measures__int_cqm234__performance_period')}} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
         and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
     where lower(encounter_type) in (
@@ -34,27 +36,31 @@ with  visit_codes as (
         , 'outpatient rehabilitation'
         , 'telehealth'
      )
+
 )
 
 , procedure_encounters as (
+
     select 
           patient_id
         , procedure_date as min_date
         , procedure_date as max_date
     from {{ref('quality_measures__stg_core__procedure')}} proc
-    inner join {{ref('quality_measures__int_234__performance_period')}}  as pp
+    inner join {{ref('quality_measures__int_cqm234__performance_period')}}  as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
     inner join  visit_codes
         on coalesce(proc.normalized_code,proc.source_code) = visit_codes.code
 
-
 )
+
 , claims_encounters as (
-    select patient_id
-    , coalesce(claim_start_date,claim_end_date) as min_date
-    , coalesce(claim_end_date,claim_start_date) as max_date
+
+    select 
+          patient_id
+        , coalesce(claim_start_date,claim_end_date) as min_date
+        , coalesce(claim_end_date,claim_start_date) as max_date
     from {{ref('quality_measures__stg_medical_claim')}} medical_claim
-    inner join {{ref('quality_measures__int_234__performance_period')}}  as pp on
+    inner join {{ref('quality_measures__int_cqm234__performance_period')}}  as pp on
         coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
          and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
     inner join  visit_codes
@@ -75,30 +81,29 @@ with  visit_codes as (
 )
 
 , encounters_by_patient as (
-    select patient_id,min(min_date) min_date, max(max_date) max_date,
-        concat(concat(
+    select
+          patient_id
+        , min(min_date) min_date
+        , max(max_date) max_date
+        , concat(concat(
             coalesce(min(visit_enc),'')
             ,coalesce(min(proc_enc),''))
             ,coalesce(min(claim_enc),'')
             ) as qualifying_types
     from all_encounters
     group by patient_id
+
 )
 
 , hypertension_codes as (
 
-    -- select
-    --       code
-    --     , code_system
-    -- from {{ ref('quality_measures__value_sets') }}
-    -- where lower(concept_name) in (
-    --       'diabetes'
-    --     , 'hba1c laboratory test'
-    -- )
-
     select
-         'I10' as code
-        , 'icd-10-cm' as code_system 
+          code
+        , code_system
+    from {{ ref('quality_measures__value_sets') }}
+    where lower(concept_name) in (
+          'essential hypertension'
+    )
 
 )
 
@@ -113,7 +118,6 @@ with  visit_codes as (
         , source_code_type
         , normalized_code
         , normalized_code_type
-
     from {{ ref('quality_measures__stg_core__condition')}}
 
 )
@@ -147,7 +151,6 @@ with  visit_codes as (
         on p.patient_id = e.patient_id
     where p.death_date is null
 
-
 )
 
 , qualifying_patients as (
@@ -165,7 +168,7 @@ with  visit_codes as (
     from hypertension_conditions
     left join patients_with_age
         on hypertension_conditions.patient_id = patients_with_age.patient_id
-    cross join {{ref('quality_measures__int_234__performance_period')}} pp
+    cross join {{ref('quality_measures__int_cqm234__performance_period')}} pp
     where max_age >= 18 and min_age <=  85
 
 )
