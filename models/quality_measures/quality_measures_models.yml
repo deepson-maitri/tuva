@@ -813,25 +813,25 @@ models:
         description: The date and timestamp of the dbt run.
 
 ### Controlling Blood Pressure
-  - name: quality_measures__int_cqm234__performance_period
+  - name: quality_measures__int_cqm236__performance_period
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm234__performance_period
+      alias: _int_cqm236__performance_period
       tags: quality_measures
       materialized: view
     description: >
       Performance Period definition for Controlling Blood Pressure.
 
-  - name: quality_measures__int_cqm234_denominator
+  - name: quality_measures__int_cqm236_denominator
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm234_denominator
+      alias: _int_cqm236_denominator
       tags: quality_measures
       materialized: table
     description: >
-      Denominator logic for the reporting version of CQM 234, Controlling Blood Pressure
+      Denominator logic for the reporting version of CQM 236, Controlling Blood Pressure
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
