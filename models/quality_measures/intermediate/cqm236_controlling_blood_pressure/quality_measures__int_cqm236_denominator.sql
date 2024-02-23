@@ -26,7 +26,7 @@ with  visit_codes as (
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
     from {{ref('quality_measures__stg_core__encounter')}} encounter
-    inner join {{ref('quality_measures__int_cqm234__performance_period')}} as pp
+    inner join {{ref('quality_measures__int_cqm236__performance_period')}} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
         and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
     where lower(encounter_type) in (
@@ -46,7 +46,7 @@ with  visit_codes as (
         , procedure_date as min_date
         , procedure_date as max_date
     from {{ref('quality_measures__stg_core__procedure')}} proc
-    inner join {{ref('quality_measures__int_cqm234__performance_period')}}  as pp
+    inner join {{ref('quality_measures__int_cqm236__performance_period')}}  as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
     inner join  visit_codes
         on coalesce(proc.normalized_code,proc.source_code) = visit_codes.code
@@ -60,7 +60,7 @@ with  visit_codes as (
         , coalesce(claim_start_date,claim_end_date) as min_date
         , coalesce(claim_end_date,claim_start_date) as max_date
     from {{ref('quality_measures__stg_medical_claim')}} medical_claim
-    inner join {{ref('quality_measures__int_cqm234__performance_period')}}  as pp on
+    inner join {{ref('quality_measures__int_cqm236__performance_period')}}  as pp on
         coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
          and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
     inner join  visit_codes
@@ -168,7 +168,7 @@ with  visit_codes as (
     from hypertension_conditions
     left join patients_with_age
         on hypertension_conditions.patient_id = patients_with_age.patient_id
-    cross join {{ref('quality_measures__int_cqm234__performance_period')}} pp
+    cross join {{ref('quality_measures__int_cqm236__performance_period')}} pp
     where max_age >= 18 and min_age <=  85
 
 )
