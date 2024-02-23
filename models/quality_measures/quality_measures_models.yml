@@ -823,7 +823,7 @@ models:
     description: >
       Performance Period definition for Controlling Blood Pressure.
 
-- name: quality_measures__int_cqm234_denominator
+  - name: quality_measures__int_cqm234_denominator
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
