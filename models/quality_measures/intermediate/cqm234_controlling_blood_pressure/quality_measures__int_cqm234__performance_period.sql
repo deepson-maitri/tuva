@@ -5,30 +5,25 @@
 
 {%- set measure_id -%}
 
--- (select id
--- from {{ ref('quality_measures__measures') }}
--- where id = '234')
-
-    (select 234 as id)
+(select id
+from {{ ref('quality_measures__measures') }}
+where id = 'CQM236')
 
 {%- endset -%}
 
 {%- set measure_name -%}
 
--- (select name
--- from {{ ref('quality_measures__measures') }}
--- where id = '234')
-
-(select 'controlling blood pressure' as name)
+(select name
+from {{ ref('quality_measures__measures') }}
+where id = 'CQM236')
 
 {%- endset -%}
 
 {%- set measure_version -%}
--- (select version
--- from {{ ref('quality_measures__measures') }}
--- where id = '234')
 
-(select 2023 as measure_version)
+(select version
+from {{ ref('quality_measures__measures') }}
+where id = 'CQM236')
 
 {%- endset -%}
 
